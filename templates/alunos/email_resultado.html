@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Resultado da Avaliação</h1>
+        </div>
+
+        <div class="alert {% if aprovado %}alert-success{% else %}alert-danger{% endif %}">
+            <h2>{% if aprovado %}Parabéns! Você foi aprovado!{% else %}Infelizmente você não foi aprovado.{% endif %}</h2>
+            <p>Nota Final: {{ nota_final|floatformat:1 }}</p>
+        </div>
+
+        <div class="card">
+            <h3>Detalhes da Avaliação</h3>
+            <p><strong>Aluno:</strong> {{ aluno.nome_completo }}</p>
+            <p><strong>Faixa Atual:</strong> {{ aluno.faixa_atual }}</p>
+            <p><strong>Próxima Faixa:</strong> {{ aluno.faixa_proxima }}</p>
+            <p><strong>Data da Avaliação:</strong> {{ avaliacao.data_avaliacao|date:"d/m/Y H:i" }}</p>
+        </div>
+
+        <div class="footer">
+            <p>Este é um email automático. Por favor, não responda.</p>
+            <p>Sistema de Avaliação de Faixas</p>
+        </div>
+    </div>
+</body>
+</html> 

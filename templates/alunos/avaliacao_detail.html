@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Avaliação - {{ avaliacao.aluno.nome_completo }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="mb-0">Avaliação - {{ avaliacao.aluno.nome_completo }}</h2>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h5 class="mb-2">Informações da Avaliação</h5>
+                    <p class="mb-1"><strong>Faixa Atual:</strong> {{ avaliacao.aluno.faixa_atual }}</p>
+                    <p class="mb-1"><strong>Próxima Faixa:</strong> {{ avaliacao.aluno.faixa_proxima }}</p>
+                    <p class="mb-0"><strong>Data:</strong> {{ avaliacao.data_avaliacao|date:"d/m/Y H:i" }}</p>
+                </div>
+
+                {% if avaliacao.nota_final is not None %}
+                <div class="alert {% if avaliacao.aprovado %}alert-success{% else %}alert-danger{% endif %}">
+                    <h5 class="mb-2">Resultado Final</h5>
+                    <p class="mb-1"><strong>Nota Final:</strong> {{ avaliacao.nota_final|floatformat:1 }}</p>
+                    <p class="mb-0"><strong>Resultado:</strong> {% if avaliacao.aprovado %}Aprovado{% else %}Reprovado{% endif %}</p>
+                </div>
+                {% endif %}
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {% for resposta in avaliacao.respostas.all %}
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                Questão {{ forloop.counter }}
+                                <span class="badge {% if resposta.questao.tipo == 'TEORICA' %}bg-primary{% else %}bg-success{% endif %} ms-2">
+                                    {{ resposta.questao.get_tipo_display }}
+                                </span>
+                                {% if resposta.questao.prioritaria %}
+                                <span class="badge bg-warning ms-2">Prioritária</span>
+                                {% endif %}
+                            </h5>
+                            <small class="text-muted">Peso: {{ resposta.questao.peso }}</small>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ resposta.questao.texto }}</p>
+                            {% if resposta.conceito %}
+                            <div class="alert alert-info">
+                                <strong>Conceito:</strong> {{ resposta.get_conceito_display }}
+                                {% if resposta.observacao %}
+                                <br>
+                                <strong>Observação:</strong> {{ resposta.observacao }}
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <div class="mb-3">
+                                {{ form|crispy }}
+                                <input type="hidden" name="questao" value="{{ resposta.questao.id }}">
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    {% if avaliacao.nota_final is None %}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Salvar Resposta</button>
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

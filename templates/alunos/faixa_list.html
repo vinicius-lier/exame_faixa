@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Faixas{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Lista de Faixas</h1>
+    <a href="{% url 'faixa_create' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nova Faixa
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Ordem</th>
+                <th>Nome</th>
+                <th>Cronograma</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for faixa in faixas %}
+            <tr>
+                <td>{{ faixa.ordem }}</td>
+                <td>{{ faixa.nome }}</td>
+                <td>
+                    {% if faixa.cronograma_pdf %}
+                    <a href="{{ faixa.cronograma_pdf.url }}" class="btn btn-sm btn-info" target="_blank">
+                        <i class="fas fa-file-pdf"></i> Ver PDF
+                    </a>
+                    {% else %}
+                    <span class="text-muted">Sem cronograma</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'questao_create' %}?faixa={{ faixa.id }}" class="btn btn-sm btn-success">
+                        <i class="fas fa-plus"></i> Nova Questão
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center">Nenhuma faixa cadastrada.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} 
