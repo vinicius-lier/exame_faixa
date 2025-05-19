@@ -16,8 +16,8 @@ class FaixaAdmin(admin.ModelAdmin):
 
 @admin.register(Questao)
 class QuestaoAdmin(admin.ModelAdmin):
-    list_display = ('texto', 'faixa', 'tipo', 'peso', 'prioritaria')
-    list_filter = ('faixa', 'tipo', 'prioritaria')
+    list_display = ('texto', 'faixa', 'natureza')
+    list_filter = ('faixa', 'natureza')
     search_fields = ('texto',)
 
 @admin.register(Avaliacao)

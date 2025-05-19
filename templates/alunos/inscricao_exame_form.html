@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscrição para Exame</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f8f9fa; }
+        .form-card {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 32px 28px 24px 28px;
+            margin-top: 32px;
+        }
+        .logo-exame {
+            display: block;
+            margin: 0 auto 18px auto;
+            max-width: 120px;
+            max-height: 120px;
+        }
+        .form-title {
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.7rem;
+            margin-bottom: 18px;
+        }
+        .agradecimento {
+            font-size: 1.2rem;
+            font-weight: 500;
+            text-align: center;
+            color: #198754;
+            margin-top: 32px;
+        }
+    </style>
+</head>
+<body>
+<div class="container" style="max-width: 480px; margin: 0 auto;">
+    <div class="form-card">
+        <img src="{% if request.session.logo_url %}{{ request.session.logo_url }}{% else %}/media/logo.png{% endif %}" alt="Logo" class="logo-exame">
+        <div class="form-title">Inscrição para Exame de Faixa</div>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="agradecimento">Obrigado por se inscrever!<br>{{ message }}</div>
+            {% endfor %}
+        {% else %}
+        <form method="post" enctype="multipart/form-data" id="inscricao-form">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div class="mb-3">{{ form.nome_completo.label_tag }}{{ form.nome_completo }}</div>
+            <div class="mb-3">{{ form.responsavel.label_tag }}{{ form.responsavel }}</div>
+            <div class="mb-3">{{ form.email.label_tag }}{{ form.email }}</div>
+            <div class="mb-3">{{ form.telefone.label_tag }}{{ form.telefone }}</div>
+            <div class="mb-3">{{ form.faixa_atual.label_tag }}{{ form.faixa_atual }}</div>
+            <div class="mb-3">{{ form.faixa_proxima.label_tag }}{{ form.faixa_proxima }}</div>
+            <div class="mb-3">{{ form.tamanho_faixa.label_tag }}{{ form.tamanho_faixa }}</div>
+            <div class="mb-3">{{ form.turma.label_tag }}{{ form.turma }}</div>
+            <div class="mb-3">{{ form.comprovante_pagamento.label_tag }}{{ form.comprovante_pagamento }}</div>
+            <div class="alert alert-info mt-3">
+                <strong>Requisitos para o exame:</strong><br>
+                {% if evento and evento.requisitos %}
+                    {{ evento.requisitos|linebreaksbr }}
+                {% else %}
+                    - Estar em dia com a mensalidade<br>
+                    - Ter frequência mínima exigida<br>
+                    - Ter autorização do professor<br>
+                {% endif %}
+            </div>
+            <div class="alert alert-warning">
+                <strong>Data do exame:</strong> <span>{% if evento %}{{ evento.data|date:'d/m/Y' }}{% else %}______/______/______{% endif %}</span><br>
+                <strong>Valor da taxa:</strong> 
+                {% if form.is_bound and form.cleaned_data.faixa_proxima %}
+                    {% with faixa=form.cleaned_data.faixa_proxima %}
+                        R$ {{ faixa.preco|floatformat:2 }}
+                    {% endwith %}
+                {% else %}
+                    Selecione a faixa
+                {% endif %}
+            </div>
+            <button type="submit" class="btn btn-success w-100 py-2 mt-2" style="font-size:1.1rem;">Enviar Inscrição</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html> 

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Novo Evento de Exame{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 500px;">
+    <h2 class="mb-4">Novo Evento de Exame</h2>
+    <form method="post" class="card p-4 shadow-sm">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="mb-3">{{ form.nome.label_tag }}{{ form.nome }}</div>
+        <div class="mb-3">{{ form.data.label_tag }}{{ form.data }}</div>
+        <div class="mb-3">{{ form.requisitos.label_tag }}{{ form.requisitos }}</div>
+        <button type="submit" class="btn btn-primary w-100">Salvar</button>
+    </form>
+</div>
+{% endblock %} 

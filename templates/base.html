@@ -7,16 +7,120 @@
     <title>{% block title %}Sistema de Avaliação de Faixas{% endblock %}</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    {% if request.session.logo_url %}
+        <link rel="icon" type="image/png" href="{{ request.session.logo_url }}" />
+    {% else %}
+        <link rel="icon" type="image/png" href="/media/logo.png" />
+    {% endif %}
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background: #0d6efd;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+        }
+        .sidebar .logo-container {
+            width: 100%;
+            padding: 32px 0 16px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-bottom: 1px solid #ffffff22;
+        }
+        .sidebar .logo-img {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            border-radius: 50%;
+            background: #fff;
+            margin-bottom: 8px;
+        }
+        .sidebar nav {
+            width: 100%;
+            margin-top: 32px;
+        }
+        .sidebar nav a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 14px 32px;
+            font-size: 1.1em;
+            transition: background 0.2s;
+        }
+        .sidebar nav a:hover {
+            background: #084298;
+        }
+        .sidebar .logo-upload-form {
+            margin-top: 8px;
+            width: 100%;
+            text-align: center;
+        }
+        .sidebar .logo-upload-form input[type="file"] {
+            display: none;
+        }
+        .sidebar .logo-upload-label {
+            background: #fff;
+            color: #0d6efd;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            cursor: pointer;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+        .main-content {
+            margin-left: 240px;
+            padding: 32px 16px 16px 16px;
+            flex: 1 0 auto;
+        }
+        footer.footer {
+            flex-shrink: 0;
+            padding: 6px 0;
+            font-size: 0.95em;
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 100vw; height: auto; position: relative; flex-direction: row; }
+            .main-content { margin-left: 0; padding-top: 180px; }
+        }
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <header class="header">
-        <div class="container">
-            <h1>Sistema de Avaliação de Faixas</h1>
+    <aside class="sidebar">
+        <div class="logo-container">
+            <img src="{% if request.session.logo_url %}{{ request.session.logo_url }}{% else %}{% static 'img/logo_padrao.png' %}{% endif %}" alt="Logo" class="logo-img" id="logo-img">
+            <form class="logo-upload-form" method="post" enctype="multipart/form-data" action="{% url 'alunos:logo_upload' %}">
+                {% csrf_token %}
+                <label for="logo-upload" class="logo-upload-label">Trocar Logo</label>
+                <input id="logo-upload" name="logo" type="file" accept="image/*" onchange="this.form.submit()">
+            </form>
         </div>
-    </header>
-
-    <main class="container">
+        <nav>
+            <a href="{% url 'alunos:dashboard_admin' %}">Dashboard</a>
+            <a href="{% url 'alunos:aluno_list' %}">Alunos</a>
+            <a href="{% url 'alunos:faixa_list' %}">Faixas</a>
+            <a href="{% url 'alunos:questao_list' %}">Questões</a>
+            <a href="{% url 'alunos:turma_create' %}" class="text-success"><b>+ Nova Turma</b></a>
+            <a href="{% url 'alunos:eventoexame_create' %}" class="text-success"><b>+ Novo Evento</b></a>
+        </nav>
+    </aside>
+    <main class="main-content">
         {% if messages %}
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }}">
@@ -24,16 +128,13 @@
                 </div>
             {% endfor %}
         {% endif %}
-
         {% block content %}{% endblock %}
     </main>
-
     <footer class="footer">
         <div class="container">
-            <p>&copy; {% now "Y" %} Sistema de Avaliação de Faixas. Todos os direitos reservados.</p>
+            <p>© Vinicius Oliveira . Todos os direitos reservados.</p>
         </div>
     </footer>
-
     {% block extra_js %}{% endblock %}
 </body>
 </html> 

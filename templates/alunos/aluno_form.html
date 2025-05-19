@@ -15,7 +15,7 @@
                     {% csrf_token %}
                     {{ form|crispy }}
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                        <a href="{% url 'alunos:aluno_list' %}" class="btn btn-secondary me-md-2">Cancelar</a>
+                        <button type="button" class="btn btn-secondary me-md-2" onclick="window.history.back();">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Salvar</button>
                     </div>
                 </form>
@@ -23,4 +23,41 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const tabelaFaixa = {
+        'M000': '2,00M',
+        'M00/M0': '2,15M',
+        'M1/M2': '2,30M',
+        'M3': '2,60M',
+        'A1': '2,80M',
+        'A2': '3,00M',
+        'A3': '3,20M',
+        'A4': '3,40M'
+    };
+    document.addEventListener('DOMContentLoaded', function() {
+        const kimonoInput = document.getElementById('id_tamanho_faixa');
+        const faixaInput = document.getElementById('id_tamanho_faixa');
+        const kimonoField = document.getElementById('id_tamanho_faixa') || document.querySelector('[name="tamanho_faixa"]');
+        const kimonoOptions = Object.keys(tabelaFaixa);
+        // Tenta encontrar o campo de tamanho do kimono
+        let kimonoSelect = document.getElementById('id_tamanho_faixa');
+        kimonoOptions.forEach(function(opt) {
+            if (!kimonoSelect) {
+                kimonoSelect = document.querySelector(`[name='tamanho_faixa']`);
+            }
+        });
+        // Se encontrar o campo de tamanho do kimono
+        if (kimonoSelect) {
+            kimonoSelect.addEventListener('change', function() {
+                const valor = kimonoSelect.value;
+                if (tabelaFaixa[valor]) {
+                    faixaInput.value = tabelaFaixa[valor];
+                }
+            });
+        }
+    });
+</script>
 {% endblock %} 

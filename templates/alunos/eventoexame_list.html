@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Eventos de Exame{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Eventos de Exame</h1>
+    <a href="{% url 'alunos:eventoexame_create' %}" class="btn btn-primary">Novo Evento</a>
+</div>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Data</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for evento in eventos %}
+        <tr>
+            <td>{{ evento.nome }}</td>
+            <td>{{ evento.data|date:'d/m/Y' }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="2" class="text-center">Nenhum evento cadastrado.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %} 

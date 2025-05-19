@@ -13,7 +13,7 @@ urlpatterns = [
     
     # Faixas
     path('faixas/', views.FaixaListView.as_view(), name='faixa_list'),
-    path('faixas/nova/', views.FaixaCreateView.as_view(), name='faixa_create'),
+    path('faixas/criar/', views.FaixaCreateView.as_view(), name='faixa_create'),
     path('faixas/<int:pk>/editar/', views.FaixaUpdateView.as_view(), name='faixa_update'),
     path('faixas/<int:pk>/excluir/', views.FaixaDeleteView.as_view(), name='faixa_delete'),
     
@@ -32,4 +32,21 @@ urlpatterns = [
     # Certificados
     path('certificados/<int:pk>/', views.CertificadoDetailView.as_view(), name='certificado_detail'),
     path('certificados/<int:pk>/gerar/', views.CertificadoGerarView.as_view(), name='certificado_gerar'),
+    
+    # Upload da logo
+    path('logo_upload/', views.LogoUploadView.as_view(), name='logo_upload'),
+    
+    # Dashboard admin
+    path('dashboard/', views.DashboardAdminView.as_view(), name='dashboard_admin'),
+    
+    # Inscrição no exame
+    path('inscricao-exame/', views.InscricaoExameView.as_view(), name='inscricao_exame'),
+    
+    # Turmas
+    path('turmas/', views.TurmaListView.as_view(), name='turma_list'),
+    path('turmas/nova/', views.TurmaCreateView.as_view(), name='turma_create'),
+    
+    # Eventos de Exame
+    path('eventos-exame/', views.EventoExameListView.as_view(), name='eventoexame_list'),
+    path('eventos-exame/novo/', views.EventoExameCreateView.as_view(), name='eventoexame_create'),
 ] 

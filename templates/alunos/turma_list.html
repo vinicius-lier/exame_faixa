@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Turmas{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Turmas</h1>
+    <a href="{% url 'alunos:turma_create' %}" class="btn btn-primary">Nova Turma</a>
+</div>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nome</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for turma in turmas %}
+        <tr>
+            <td>{{ turma.nome }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="1" class="text-center">Nenhuma turma cadastrada.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %} 

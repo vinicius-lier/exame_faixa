@@ -8,16 +8,60 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-header">
-                <h2 class="mb-0">Nova Avaliação</h2>
+                <h2 class="mb-0">{{ aluno.nome_completo }}</h2>
             </div>
             <div class="card-body">
                 <form method="post" novalidate>
                     {% csrf_token %}
                     {{ form|crispy }}
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                        <a href="{% url 'alunos:aluno_list' %}" class="btn btn-secondary me-md-2">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Iniciar Avaliação</button>
+                    {% if avaliacao.nota_final is not None %}
+                    <div class="alert {% if avaliacao.aprovado %}alert-success{% else %}alert-danger{% endif %}">
+                        <h5 class="mb-2">Resultado Final</h5>
+                        <p class="mb-1"><strong>Nota Final:</strong> {{ avaliacao.nota_final|floatformat:1 }}</p>
+                        <p class="mb-0"><strong>Resultado:</strong> {% if avaliacao.aprovado %}Aprovado{% else %}Reprovado{% endif %}</p>
                     </div>
+                    {% endif %}
+                    {% if respostas %}
+                        <hr>
+                        <h4 class="mb-3">Questões Sorteadas</h4>
+                        {% for resposta_form in respostas.forms %}
+                        <div class="card mb-3">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    Questão {{ forloop.counter }}
+                                    <span class="badge {% if resposta_form.instance.questao.natureza == 'teorica' %}bg-primary{% else %}bg-success{% endif %} ms-2">
+                                        {{ resposta_form.instance.questao.get_natureza_display }}
+                                    </span>
+                                    {% if resposta_form.instance.questao.prioritaria %}
+                                    <span class="badge bg-warning ms-2">Prioritária</span>
+                                    {% endif %}
+                                </h5>
+                                <small class="text-muted">Peso: {{ resposta_form.instance.questao.peso }}</small>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">{{ resposta_form.instance.questao.texto }}</p>
+                                {% if avaliacao.nota_final is not None %}
+                                    <div class="alert alert-info">
+                                        <strong>Conceito:</strong> {{ resposta_form.instance.get_conceito_display }}
+                                        {% if resposta_form.instance.observacao %}
+                                        <br>
+                                        <strong>Observação:</strong> {{ resposta_form.instance.observacao }}
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    {{ resposta_form.conceito|as_crispy_field }}
+                                    {{ resposta_form.observacao|as_crispy_field }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% if avaliacao.nota_final is none %}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="button" class="btn btn-secondary me-md-2" onclick="window.history.back();">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Avaliação</button>
+                    </div>
+                    {% endif %}
                 </form>
             </div>
         </div>

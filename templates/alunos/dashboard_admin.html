@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<style>
+.kpi-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-bottom: 32px;
+}
+.kpi-card {
+    flex: 1 1 0;
+    min-width: 220px;
+    max-width: 25%;
+    min-height: 100px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding: 18px 20px;
+    color: #fff;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+.kpi-blue { background: #4e73df; }
+.kpi-green { background: #1cc88a; }
+.kpi-yellow { background: #f6c23e; color: #212529; }
+.kpi-orange { background: #fd7e14; }
+.kpi-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 0.8;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.kpi-value {
+    font-size: 1.7rem;
+    font-weight: bold;
+    margin-top: 2px;
+}
+.kpi-icon {
+    font-size: 2.2rem;
+    opacity: 0.25;
+}
+@media (max-width: 991px) {
+    .kpi-card { max-width: 48%; min-width: 180px; margin-bottom: 16px; }
+    .kpi-row { gap: 12px; }
+}
+@media (max-width: 600px) {
+    .kpi-card { max-width: 100%; min-width: 120px; margin-bottom: 10px; }
+    .kpi-row { flex-direction: column; gap: 8px; }
+}
+</style>
+<div class="container" style="max-width: 1100px; margin: 0 auto;">
+    <h1 class="mb-4">Dashboard</h1>
+    <div class="kpi-row">
+        <div class="card kpi-card kpi-blue">
+            <div>
+                <div class="kpi-title">ALUNOS</div>
+                <div class="kpi-value">{{ total_alunos|default:'-' }}</div>
+            </div>
+            <div class="kpi-icon"><i class="fas fa-users"></i></div>
+        </div>
+        <div class="card kpi-card kpi-green">
+            <div>
+                <div class="kpi-title">TURMAS</div>
+                <div class="kpi-value">{{ total_turmas|default:'-' }}</div>
+            </div>
+            <div class="kpi-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+        </div>
+        <div class="card kpi-card kpi-yellow">
+            <div>
+                <div class="kpi-title">AVALIAÇÕES</div>
+                <div class="kpi-value">{{ total_avaliacoes|default:'-' }}</div>
+            </div>
+            <div class="kpi-icon"><i class="fas fa-clipboard-check"></i></div>
+        </div>
+        <div class="card kpi-card kpi-orange">
+            <div>
+                <div class="kpi-title">FAIXAS</div>
+                <div class="kpi-value">{{ total_faixas|default:'-' }}</div>
+            </div>
+            <div class="kpi-icon"><i class="fas fa-award"></i></div>
+        </div>
+    </div>
+
+    <h4>Ranking Geral</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Aluno</th>
+                <th>Faixa Atual</th>
+                <th>Nota Final</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for avaliacao in ranking_geral %}
+            <tr>
+                <td>{{ avaliacao.aluno.nome_completo|default:"-" }}</td>
+                <td>{{ avaliacao.aluno.faixa_atual|default:"-" }}</td>
+                <td>{{ avaliacao.nota_final|default_if_none:"" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="text-center">Nenhum dado disponível.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h4>Ranking por Turma</h4>
+    <form method="get" class="mb-3">
+        <select name="turma" class="form-select" style="max-width: 300px; display: inline-block;">
+            <option value="">Selecione uma turma</option>
+            {% for turma in turmas %}
+                <option value="{{ turma }}" {% if turma == turma_selecionada %}selected{% endif %}>{{ turma }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+    </form>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Aluno</th>
+                <th>Faixa Atual</th>
+                <th>Nota Final</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for avaliacao in ranking_turma %}
+            <tr>
+                <td>{{ avaliacao.aluno.nome_completo|default:"-" }}</td>
+                <td>{{ avaliacao.aluno.faixa_atual|default:"-" }}</td>
+                <td>{{ avaliacao.nota_final|default_if_none:"" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="text-center">Nenhum dado disponível.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h4>Ranking Faixas Base</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Aluno</th>
+                <th>Faixa Atual</th>
+                <th>Nota Final</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for avaliacao in ranking_base %}
+            <tr>
+                <td>{{ avaliacao.aluno.nome_completo|default:"-" }}</td>
+                <td>{{ avaliacao.aluno.faixa_atual|default:"-" }}</td>
+                <td>{{ avaliacao.nota_final|default_if_none:"" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="text-center">Nenhum dado disponível.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h4>Ranking Faixas Intermediárias</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Aluno</th>
+                <th>Faixa Atual</th>
+                <th>Nota Final</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for avaliacao in ranking_inter %}
+            <tr>
+                <td>{{ avaliacao.aluno.nome_completo|default:"-" }}</td>
+                <td>{{ avaliacao.aluno.faixa_atual|default:"-" }}</td>
+                <td>{{ avaliacao.nota_final|default_if_none:"" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="text-center">Nenhum dado disponível.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} 

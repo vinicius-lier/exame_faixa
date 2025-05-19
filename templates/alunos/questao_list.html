@@ -5,7 +5,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Lista de Questões</h1>
-    <a href="{% url 'questao_create' %}" class="btn btn-primary">
+    <a href="{% url 'alunos:questao_create' %}" class="btn btn-primary">
         <i class="fas fa-plus"></i> Nova Questão
     </a>
 </div>
@@ -16,9 +16,10 @@
             <tr>
                 <th>Faixa</th>
                 <th>Questão</th>
-                <th>Tipo</th>
+                <th>Natureza</th>
                 <th>Peso</th>
                 <th>Prioritária</th>
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -26,7 +27,7 @@
             <tr>
                 <td>{{ questao.faixa }}</td>
                 <td>{{ questao.texto }}</td>
-                <td>{{ questao.get_tipo_display }}</td>
+                <td>{{ questao.get_natureza_display }}</td>
                 <td>{{ questao.peso }}</td>
                 <td>
                     {% if questao.prioritaria %}
@@ -35,10 +36,18 @@
                     <span class="badge bg-secondary">Não</span>
                     {% endif %}
                 </td>
+                <td>
+                    <a href="{% url 'alunos:questao_update' questao.pk %}" class="btn btn-sm btn-warning">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <a href="{% url 'alunos:questao_delete' questao.pk %}" class="btn btn-sm btn-danger">
+                        <i class="fas fa-trash"></i> Excluir
+                    </a>
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5" class="text-center">Nenhuma questão cadastrada.</td>
+                <td colspan="6" class="text-center">Nenhuma questão cadastrada.</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -5,7 +5,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Lista de Faixas</h1>
-    <a href="{% url 'faixa_create' %}" class="btn btn-primary">
+    <a href="{% url 'alunos:faixa_create' %}" class="btn btn-primary">
         <i class="fas fa-plus"></i> Nova Faixa
     </a>
 </div>
@@ -16,7 +16,7 @@
             <tr>
                 <th>Ordem</th>
                 <th>Nome</th>
-                <th>Cronograma</th>
+                <th>Preço</th>
                 <th>Ações</th>
             </tr>
         </thead>
@@ -25,18 +25,13 @@
             <tr>
                 <td>{{ faixa.ordem }}</td>
                 <td>{{ faixa.nome }}</td>
+                <td>R$ {{ faixa.preco }}</td>
                 <td>
-                    {% if faixa.cronograma_pdf %}
-                    <a href="{{ faixa.cronograma_pdf.url }}" class="btn btn-sm btn-info" target="_blank">
-                        <i class="fas fa-file-pdf"></i> Ver PDF
+                    <a href="{% url 'alunos:faixa_update' faixa.pk %}" class="btn btn-sm btn-warning">
+                        <i class="fas fa-edit"></i> Editar
                     </a>
-                    {% else %}
-                    <span class="text-muted">Sem cronograma</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{% url 'questao_create' %}?faixa={{ faixa.id }}" class="btn btn-sm btn-success">
-                        <i class="fas fa-plus"></i> Nova Questão
+                    <a href="{% url 'alunos:faixa_delete' faixa.pk %}" class="btn btn-sm btn-danger">
+                        <i class="fas fa-trash"></i> Excluir
                     </a>
                 </td>
             </tr>

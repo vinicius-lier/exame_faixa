@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Nova Turma{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 500px;">
+    <h2 class="mb-4">Nova Turma</h2>
+    <form method="post" class="card p-4 shadow-sm">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="mb-3">{{ form.nome.label_tag }}{{ form.nome }}</div>
+        <div class="mb-3">{{ form.dias.label_tag }}{{ form.dias }}</div>
+        <div class="mb-3">{{ form.horarios.label_tag }}{{ form.horarios }}</div>
+        <button type="submit" class="btn btn-primary w-100">Salvar</button>
+    </form>
+</div>
+{% endblock %} 

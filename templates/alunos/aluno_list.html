@@ -19,21 +19,29 @@
                 <th>Faixa Atual</th>
                 <th>Próxima Faixa</th>
                 <th>Data de Inscrição</th>
+                <th>Nota</th>
                 <th>Ações</th>
             </tr>
         </thead>
         <tbody>
-            {% for aluno in alunos %}
+            {% for info in alunos_info %}
             <tr>
-                <td>{{ aluno.nome_completo }}</td>
-                <td>{{ aluno.nome_bordado }}</td>
-                <td>{{ aluno.faixa_atual }}</td>
-                <td>{{ aluno.faixa_proxima }}</td>
-                <td>{{ aluno.data_inscricao|date:"d/m/Y H:i" }}</td>
+                <td>{{ info.aluno.nome_completo }}</td>
+                <td>{{ info.aluno.nome_bordado }}</td>
+                <td>{{ info.aluno.faixa_atual }}</td>
+                <td>{{ info.aluno.faixa_proxima }}</td>
+                <td>{{ info.aluno.data_inscricao|date:"d/m/Y H:i" }}</td>
+                <td>{% if info.nota is not None %}{{ info.nota|floatformat:1 }}{% else %}-{% endif %}</td>
                 <td>
-                    <a href="{% url 'alunos:avaliacao_create' %}?aluno={{ aluno.id }}" class="btn btn-sm btn-success">
-                        <i class="fas fa-graduation-cap"></i> Avaliar
-                    </a>
+                    {% if info.nota is not None %}
+                        <button class="btn btn-sm btn-secondary" disabled>Avaliado</button>
+                    {% else %}
+                        <a href="{% url 'alunos:avaliacao_create' pk=info.aluno.id %}" class="btn btn-sm btn-success">
+                            <i class="fas fa-graduation-cap"></i> Avaliar
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'alunos:aluno_update' info.aluno.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="{% url 'alunos:aluno_delete' info.aluno.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir este aluno?');">Excluir</a>
                 </td>
             </tr>
             {% empty %}
