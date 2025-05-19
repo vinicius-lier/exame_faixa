@@ -11,60 +11,148 @@
                 <h2 class="mb-0">{{ aluno.nome_completo }}</h2>
             </div>
             <div class="card-body">
-                <form method="post" novalidate>
+                <!-- Seção de Confirmação dos Dados do Atleta -->
+                <div class="mb-4">
+                    <h4>Dados do Atleta</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Nome:</strong> {{ aluno.nome_completo }}</p>
+                            <p><strong>Faixa Atual:</strong> {{ aluno.faixa_atual }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Email:</strong> {{ aluno.email }}</p>
+                            <p><strong>Telefone:</strong> {{ aluno.telefone }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="post" novalidate id="avaliacaoForm">
                     {% csrf_token %}
                     {{ form|crispy }}
-                    {% if avaliacao.nota_final is not None %}
-                    <div class="alert {% if avaliacao.aprovado %}alert-success{% else %}alert-danger{% endif %}">
-                        <h5 class="mb-2">Resultado Final</h5>
-                        <p class="mb-1"><strong>Nota Final:</strong> {{ avaliacao.nota_final|floatformat:1 }}</p>
-                        <p class="mb-0"><strong>Resultado:</strong> {% if avaliacao.aprovado %}Aprovado{% else %}Reprovado{% endif %}</p>
-                    </div>
-                    {% endif %}
-                    {% if respostas %}
-                        <hr>
-                        <h4 class="mb-3">Questões Sorteadas</h4>
-                        {% for resposta_form in respostas.forms %}
-                        <div class="card mb-3">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">
-                                    Questão {{ forloop.counter }}
-                                    <span class="badge {% if resposta_form.instance.questao.natureza == 'teorica' %}bg-primary{% else %}bg-success{% endif %} ms-2">
-                                        {{ resposta_form.instance.questao.get_natureza_display }}
-                                    </span>
-                                    {% if resposta_form.instance.questao.prioritaria %}
-                                    <span class="badge bg-warning ms-2">Prioritária</span>
-                                    {% endif %}
-                                </h5>
-                                <small class="text-muted">Peso: {{ resposta_form.instance.questao.peso }}</small>
-                            </div>
-                            <div class="card-body">
-                                <p class="card-text">{{ resposta_form.instance.questao.texto }}</p>
-                                {% if avaliacao.nota_final is not None %}
-                                    <div class="alert alert-info">
-                                        <strong>Conceito:</strong> {{ resposta_form.instance.get_conceito_display }}
-                                        {% if resposta_form.instance.observacao %}
-                                        <br>
-                                        <strong>Observação:</strong> {{ resposta_form.instance.observacao }}
-                                        {% endif %}
-                                    </div>
-                                {% else %}
-                                    {{ resposta_form.conceito|as_crispy_field }}
-                                    {{ resposta_form.observacao|as_crispy_field }}
-                                {% endif %}
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% endif %}
-                    {% if avaliacao.nota_final is none %}
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
                         <button type="button" class="btn btn-secondary me-md-2" onclick="window.history.back();">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Salvar Avaliação</button>
+                        <button type="submit" class="btn btn-primary" id="gerarAvaliacaoBtn">Gerar Avaliação</button>
                     </div>
-                    {% endif %}
                 </form>
+
+                {% if respostas %}
+                    <pre>{{ respostas.management_form }}</pre>
+                    <pre>{{ respostas.forms|length }} questões carregadas</pre>
+                    <hr>
+                    <h4 class="mb-3">Questões Sorteadas</h4>
+                    <form method="post" novalidate id="avaliacaoForm">
+                        {% csrf_token %}
+                        {% for resposta_form in respostas.forms %}
+                            <div class="card mb-3">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">
+                                        Questão {{ forloop.counter }}
+                                        <span class="badge {% if resposta_form.instance.questao.natureza == 'teorica' %}bg-primary{% else %}bg-success{% endif %} ms-2">
+                                            {{ resposta_form.instance.questao.get_natureza_display }}
+                                        </span>
+                                        {% if resposta_form.instance.questao.prioritaria %}
+                                        <span class="badge bg-warning ms-2">Prioritária</span>
+                                        {% endif %}
+                                    </h5>
+                                    <small class="text-muted">Peso: {{ resposta_form.instance.questao.peso }}</small>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">{{ resposta_form.instance.questao.texto }}</p>
+                                    {% if avaliacao.nota_final is not None %}
+                                        <div class="alert alert-info">
+                                            <strong>Conceito:</strong> {{ resposta_form.instance.get_conceito_display }}
+                                            {% if resposta_form.instance.observacao %}
+                                            <br>
+                                            <strong>Observação:</strong> {{ resposta_form.instance.observacao }}
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        {{ resposta_form.conceito|as_crispy_field }}
+                                        {{ resposta_form.observacao|as_crispy_field }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {% if avaliacao.nota_final is none %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <button type="button" class="btn btn-secondary me-md-2" onclick="window.history.back();">Cancelar</button>
+                            <button type="submit" class="btn btn-primary" id="salvarAvaliacaoBtn">Salvar Avaliação</button>
+                        </div>
+                        {% endif %}
+                    </form>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
+
+<!-- Modal de Resultado -->
+<div class="modal fade" id="resultadoModal" tabindex="-1" aria-labelledby="resultadoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="resultadoModalLabel">Resultado da Avaliação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <h4>Nota Final: <span id="notaFinal"></span></h4>
+                    <p id="resultadoTexto"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary" id="confirmarResultadoBtn">Confirmar Resultado</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const gerarAvaliacaoBtn = document.getElementById('gerarAvaliacaoBtn');
+    const salvarAvaliacaoBtn = document.getElementById('salvarAvaliacaoBtn');
+    const resultadoModal = new bootstrap.Modal(document.getElementById('resultadoModal'));
+    const confirmarResultadoBtn = document.getElementById('confirmarResultadoBtn');
+
+    if (gerarAvaliacaoBtn) {
+        gerarAvaliacaoBtn.addEventListener('click', function() {
+            document.getElementById('avaliacaoForm').submit();
+        });
+    }
+
+    if (salvarAvaliacaoBtn) {
+        salvarAvaliacaoBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Aqui você pode adicionar a lógica para calcular a nota antes de mostrar o modal
+            const nota = calcularNota(); // Implemente esta função
+            document.getElementById('notaFinal').textContent = nota.toFixed(1);
+            document.getElementById('resultadoTexto').textContent = nota >= 6 ? 'Aprovado!' : 'Reprovado';
+            resultadoModal.show();
+        });
+    }
+
+    if (confirmarResultadoBtn) {
+        confirmarResultadoBtn.addEventListener('click', function() {
+            document.getElementById('avaliacaoForm').submit();
+        });
+    }
+
+    function calcularNota() {
+        // Implemente a lógica de cálculo da nota aqui
+        // Por exemplo, somar os conceitos e dividir pelo número de questões
+        let totalConceito = 0;
+        let totalQuestoes = 0;
+        document.querySelectorAll('select[name*="conceito"]').forEach(select => {
+            if (select.value) {
+                totalConceito += parseInt(select.value);
+                totalQuestoes++;
+            }
+        });
+        return totalQuestoes > 0 ? (totalConceito / (totalQuestoes * 3)) * 10 : 0;
+    }
+});
+</script>
+{% endblock %}
 {% endblock %} 

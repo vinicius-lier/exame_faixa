@@ -155,6 +155,11 @@ class Avaliacao(models.Model):
             questoes_por_natureza[natureza].remove(questao)
         # Atribui as questões à avaliação
         self.questoes.set(questoes_selecionadas)
+        self.save()
+        # Cria RespostaAvaliacao para cada questão sorteada, se não existir
+        from .models import RespostaAvaliacao
+        for questao in questoes_selecionadas:
+            RespostaAvaliacao.objects.get_or_create(avaliacao=self, questao=questao)
 
     class Meta:
         verbose_name = 'Avaliação'

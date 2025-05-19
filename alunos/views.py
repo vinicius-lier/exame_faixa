@@ -170,11 +170,19 @@ class AvaliacaoCreateView(CreateView):
     def form_valid(self, form):
         aluno = get_object_or_404(Aluno, pk=self.kwargs['pk'])
         form.instance.aluno = aluno
-        response = super().form_valid(form)
-        # Sorteia as questões usando a faixa escolhida no formulário
-        self.object.gerar_questoes(faixa=form.cleaned_data['faixa_proxima'])
-        messages.success(self.request, 'Avaliação iniciada com sucesso!')
-        return redirect('alunos:avaliacao_responder', pk=self.object.pk)
+        
+        # Se for a primeira submissão (gerar avaliação)
+        if not form.instance.pk:
+            response = super().form_valid(form)
+            # Sorteia as questões usando a faixa escolhida no formulário
+            self.object.gerar_questoes(faixa=form.cleaned_data['faixa_proxima'])
+            messages.success(self.request, 'Avaliação gerada com sucesso! Agora você pode avaliar o aluno.')
+            return redirect('alunos:avaliacao_responder', pk=self.object.pk)
+        
+        # Se for a submissão final (salvar avaliação)
+        self.object = form.save()
+        messages.success(self.request, 'Avaliação salva com sucesso!')
+        return redirect('alunos:avaliacao_detail', pk=self.object.pk)
 
     def get_success_url(self):
         return reverse_lazy('alunos:avaliacao_detail', kwargs={'pk': self.object.pk})
@@ -212,6 +220,7 @@ class AvaliacaoResponderView(UpdateView):
             self.object = form.save()
             respostas.instance = self.object
             respostas.save()
+            
             # Calcular nota final baseada apenas nos conceitos
             total_conceito = 0
             total_questoes = 0
@@ -219,14 +228,18 @@ class AvaliacaoResponderView(UpdateView):
                 if resposta.conceito is not None:
                     total_conceito += resposta.conceito
                     total_questoes += 1
+            
             nota_final = 0
             if total_questoes > 0:
                 nota_final = (total_conceito / (total_questoes * 3)) * 10  # 3 é o valor máximo do conceito
+            
             self.object.nota_final = nota_final
             self.object.aprovado = nota_final >= 6
             self.object.save()
-            messages.success(self.request, 'Respostas salvas com sucesso!')
-            return redirect('alunos:avaliacao_responder', pk=self.object.pk)
+            
+            messages.success(self.request, 'Avaliação finalizada com sucesso!')
+            return redirect('alunos:avaliacao_detail', pk=self.object.pk)
+        
         return self.render_to_response(self.get_context_data(form=form))
 
 class AvaliacaoResultadoView(DetailView):
